@@ -40,15 +40,33 @@ void HYDRO_2D::runSeqVariant(VariantID vid)
 
   HYDRO_2D_VIEWS_RAJA;
 
-  auto hydro2d_lam1 = [=] (Index_type k, Index_type j) {
+  auto hydro2d_lam1 = [=] (auto k, auto j) {
                         HYDRO_2D_BODY1_RAJA;
                       };
-  auto hydro2d_lam2 = [=] (Index_type k, Index_type j) {
+  auto hydro2d_lam2 = [=] (auto k, auto j) {
                         HYDRO_2D_BODY2_RAJA;
                       };
-  auto hydro2d_lam3 = [=] (Index_type k, Index_type j) {
+  auto hydro2d_lam3 = [=] (auto k, auto j) {
                         HYDRO_2D_BODY3_RAJA;
                       };
+
+  auto segmentTuple =  RAJA::make_tuple( RAJA::RangeSegment(kbeg, kend),
+                                         RAJA::RangeSegment(jbeg, jend));
+  using KPol =
+        RAJA::KernelPolicy<
+          RAJA::statement::For<0, RAJA::loop_exec,  // k
+            RAJA::statement::For<1, RAJA::loop_exec,  // j
+              RAJA::statement::Lambda<0>
+            >
+          >
+        >;
+
+
+  auto knl1 = RAJA::make_kernel<KPol>(segmentTuple, hydro2d_lam1);
+  auto knl2 = RAJA::make_kernel<KPol>(segmentTuple, hydro2d_lam2);
+  auto knl3 = RAJA::make_kernel<KPol>(segmentTuple, hydro2d_lam3);
+
+  auto fused = RAJA::shift_and_fuse(knl1, knl2, knl3);
 
   switch ( vid ) {
 
