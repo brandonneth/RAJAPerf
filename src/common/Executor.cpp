@@ -13,7 +13,7 @@
 #include "common/OutputUtils.hpp"
 
 // Warmup kernel to run first to remove startup overheads in timings
-#include "basic/DAXPY.hpp"
+#include "polybench/POLYBENCH_ATAX.hpp"
 
 #include <list>
 #include <vector>
@@ -172,7 +172,7 @@ void Executor::setupSuite()
     // Set reference variant if not specified.
     //
     if ( run_params.getReferenceVariant().empty() ) {
-      reference_vid = VariantID::Base_Seq;
+      reference_vid = VariantID::RAJA_OpenMP;
     }
 
   } else {
@@ -234,9 +234,7 @@ void Executor::setupSuite()
          kid != run_kern.end(); ++kid) {
 /// RDH DISABLE COUPLE KERNEL until we find a reasonable way to do 
 /// complex numbers in GPU code
-      if ( *kid != Apps_COUPLE ) {
         kernels.push_back( getKernelObject(*kid, run_params) );
-      }
     }
 
     if ( !(run_params.getInvalidVariantInput().empty()) ) {
@@ -349,7 +347,7 @@ void Executor::runSuite()
 
   cout << "\n\nRunning warmup kernel variants...\n";
 
-  KernelBase* warmup_kernel = new basic::DAXPY(run_params);
+  KernelBase* warmup_kernel = new polybench::POLYBENCH_ATAX(run_params);
 
   for (size_t iv = 0; iv < variant_ids.size(); ++iv) {
     if ( run_params.showProgress() ) {
