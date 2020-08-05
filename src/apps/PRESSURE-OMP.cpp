@@ -37,59 +37,71 @@ void PRESSURE::runOpenMPVariant(VariantID vid)
   
   switch ( vid ) {
 
-    case Base_OpenMP : {
-
-      startTimer();
-      for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
-
-        #pragma omp parallel
-        {
-
-          #pragma omp for nowait
-          for (Index_type i = ibegin; i < iend; ++i ) {
-            PRESSURE_BODY1;
-          }
-
-          #pragma omp for nowait
-          for (Index_type i = ibegin; i < iend; ++i ) {
-            PRESSURE_BODY2;
-          }
-
-        } // end omp parallel region
-
-      }
-      stopTimer();
-
-      break;
-    }
-
-    case Lambda_OpenMP : {
-
-      startTimer();
-      for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
-
-        #pragma omp parallel
-        {
-
-          #pragma omp for nowait
-          for (Index_type i = ibegin; i < iend; ++i ) {
-            pressure_lam1(i);
-          }
-
-          #pragma omp for nowait
-          for (Index_type i = ibegin; i < iend; ++i ) {
-            pressure_lam2(i);
-          }
-
-        } // end omp parallel region
-
-      }
-      stopTimer();
-
-      break;
-    }
 
     case RAJA_OpenMP : {
+
+      startTimer();
+      for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
+
+        RAJA::region<RAJA::omp_parallel_region>( [=]() {
+
+          RAJA::forall<RAJA::omp_for_nowait_exec>(
+            RAJA::RangeSegment(ibegin, iend), pressure_lam1);
+
+          RAJA::forall<RAJA::omp_for_nowait_exec>(
+            RAJA::RangeSegment(ibegin, iend), pressure_lam2);
+
+        }); // end omp parallel region
+
+      }
+      stopTimer();
+
+      break;
+    }
+
+    case Hand_Opt : {
+
+      startTimer();
+      for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
+
+        RAJA::region<RAJA::omp_parallel_region>( [=]() {
+
+          RAJA::forall<RAJA::omp_for_nowait_exec>(
+            RAJA::RangeSegment(ibegin, iend), pressure_lam1);
+
+          RAJA::forall<RAJA::omp_for_nowait_exec>(
+            RAJA::RangeSegment(ibegin, iend), pressure_lam2);
+
+        }); // end omp parallel region
+
+      }
+      stopTimer();
+
+      break;
+    }
+
+    case LC_Fused : {
+
+      startTimer();
+      for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
+
+        RAJA::region<RAJA::omp_parallel_region>( [=]() {
+
+          RAJA::forall<RAJA::omp_for_nowait_exec>(
+            RAJA::RangeSegment(ibegin, iend), pressure_lam1);
+
+          RAJA::forall<RAJA::omp_for_nowait_exec>(
+            RAJA::RangeSegment(ibegin, iend), pressure_lam2);
+
+        }); // end omp parallel region
+
+      }
+      stopTimer();
+
+      break;
+    }
+
+    case LC_Tiled : {
 
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
