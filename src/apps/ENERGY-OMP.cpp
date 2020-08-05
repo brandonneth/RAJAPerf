@@ -83,64 +83,38 @@ void ENERGY::runOpenMPVariant(VariantID vid)
     }
 
     case Hand_Opt: {
-
+      auto fused_lam = [=](Index_type i) {
+                         ENERGY_BODY1; 
+                         ENERGY_BODY2; 
+                         ENERGY_BODY3; 
+                         ENERGY_BODY4; 
+                         ENERGY_BODY5; 
+                         ENERGY_BODY6; 
+                       }; 
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
-
-        RAJA::region<RAJA::omp_parallel_region>( [=]() {
-
-          RAJA::forall<RAJA::omp_for_nowait_exec>(
-            RAJA::RangeSegment(ibegin, iend), energy_lam1);
-
-          RAJA::forall<RAJA::omp_for_nowait_exec>(
-            RAJA::RangeSegment(ibegin, iend), energy_lam2);
-
-          RAJA::forall<RAJA::omp_for_nowait_exec>(
-            RAJA::RangeSegment(ibegin, iend), energy_lam3);
-  
-          RAJA::forall<RAJA::omp_for_nowait_exec>(
-            RAJA::RangeSegment(ibegin, iend), energy_lam4);
-  
-          RAJA::forall<RAJA::omp_for_nowait_exec>(
-            RAJA::RangeSegment(ibegin, iend), energy_lam5);
-  
-          RAJA::forall<RAJA::omp_for_nowait_exec>(
-            RAJA::RangeSegment(ibegin, iend), energy_lam6);
-  
-        }); // end omp parallel region
-
+        RAJA::forall<RAJA::omp_parallel_for_exec>(
+          RAJA::RangeSegment(ibegin, iend), fused_lam);
       }
       stopTimer();
       break;
     }
 
     case LC_Fused : {
+      using EPol = RAJA::omp_parallel_for_exec;
+      auto seg = RAJA::RangeSegment(ibegin, iend);
 
+      auto knl1 = RAJA::make_forall<EPol>(seg, energy_lam1);
+      auto knl2 = RAJA::make_forall<EPol>(seg, energy_lam2);
+      auto knl3 = RAJA::make_forall<EPol>(seg, energy_lam3);
+      auto knl4 = RAJA::make_forall<EPol>(seg, energy_lam4);
+      auto knl5 = RAJA::make_forall<EPol>(seg, energy_lam5);
+      auto knl6 = RAJA::make_forall<EPol>(seg, energy_lam6);
+
+      auto fusedKnl = RAJA::fuse(knl1,knl2,knl3,knl4,knl5,knl6);
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
-
-        RAJA::region<RAJA::omp_parallel_region>( [=]() {
-
-          RAJA::forall<RAJA::omp_for_nowait_exec>(
-            RAJA::RangeSegment(ibegin, iend), energy_lam1);
-
-          RAJA::forall<RAJA::omp_for_nowait_exec>(
-            RAJA::RangeSegment(ibegin, iend), energy_lam2);
-
-          RAJA::forall<RAJA::omp_for_nowait_exec>(
-            RAJA::RangeSegment(ibegin, iend), energy_lam3);
-  
-          RAJA::forall<RAJA::omp_for_nowait_exec>(
-            RAJA::RangeSegment(ibegin, iend), energy_lam4);
-  
-          RAJA::forall<RAJA::omp_for_nowait_exec>(
-            RAJA::RangeSegment(ibegin, iend), energy_lam5);
-  
-          RAJA::forall<RAJA::omp_for_nowait_exec>(
-            RAJA::RangeSegment(ibegin, iend), energy_lam6);
-  
-        }); // end omp parallel region
-
+        fusedKnl();
       }
       stopTimer();
       break;
