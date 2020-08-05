@@ -69,10 +69,8 @@ enum SizeSpec {
  */
 enum GroupID {
 
-  Basic = 0,
-  Lcals,
+  Lcals = 0,
   Polybench,
-  Stream,
   Apps,
 
   NumGroups // Keep this one last and DO NOT remove (!!)
@@ -94,73 +92,28 @@ enum GroupID {
  *******************************************************************************
  */
 enum KernelID {
-
-//
-// Basic kernels...
-//
-  Basic_ATOMIC_PI = 0,
-  Basic_DAXPY,
-  Basic_IF_QUAD,
-  Basic_INIT3,
-  Basic_INIT_VIEW1D,
-  Basic_INIT_VIEW1D_OFFSET,
-  Basic_MULADDSUB,
-  Basic_NESTED_INIT,
-  Basic_REDUCE3_INT,
-  Basic_TRAP_INT,
-
 //
 // Lcals kernels...
 //
-  Lcals_DIFF_PREDICT,
-  Lcals_EOS,
-  Lcals_FIRST_DIFF,
-  Lcals_FIRST_MIN,
-  Lcals_FIRST_SUM,
-  Lcals_GEN_LIN_RECUR,
-  Lcals_HYDRO_1D,
+  Lcals_GEN_LIN_RECUR = 0,
   Lcals_HYDRO_2D,
-  Lcals_INT_PREDICT,
-  Lcals_PLANCKIAN,
-  Lcals_TRIDIAG_ELIM,
 
 //
 // Polybench kernels...
 //
-  Polybench_2MM,
   Polybench_3MM,
-  Polybench_ADI,
   Polybench_ATAX,
-  Polybench_FDTD_2D,
-  Polybench_FLOYD_WARSHALL,
-  Polybench_GEMM,
-  Polybench_GEMVER,
-  Polybench_GESUMMV,
   Polybench_HEAT_3D,
   Polybench_JACOBI_1D,
   Polybench_JACOBI_2D,
   Polybench_MVT,
 
-//
-// Stream kernels...
-//
-  Stream_ADD,
-  Stream_COPY,
-  Stream_DOT,
-  Stream_MUL,
-  Stream_TRIAD,
 
 //
 // Apps kernels...
 //
-  Apps_COUPLE,
-  Apps_DEL_DOT_VEC_2D,
   Apps_ENERGY,
-  Apps_FIR,
-  Apps_LTIMES,
-  Apps_LTIMES_NOVIEW,
   Apps_PRESSURE,
-  Apps_VOL3D,
 
   NumKernels // Keep this one last and NEVER comment out (!!)
 
@@ -181,18 +134,13 @@ enum KernelID {
  */
 enum VariantID {
 
-  Base_Seq = 0,
-#if defined(RUN_RAJA_SEQ)
-  Lambda_Seq,
-  RAJA_Seq,
-#endif
 
 #if defined(RAJA_ENABLE_OPENMP) && defined(RUN_OPENMP)
-  Base_OpenMP,
-  Lambda_OpenMP,
-  RAJA_OpenMP,
+  RAJA_OpenMP = 0,
+  Hand_Opt,
+  LC_Fused,
+  LC_Tiled,
 #endif
-
 #if defined(RAJA_ENABLE_TARGET_OPENMP)  
   Base_OpenMPTarget,
   RAJA_OpenMPTarget,
