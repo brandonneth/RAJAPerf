@@ -54,81 +54,125 @@ void HYDRO_2D::runOpenMPVariant(VariantID vid)
 
   switch ( vid ) {
 
-    case Base_OpenMP : {
-
-      startTimer();
-      for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
-
-        #pragma omp parallel
-        {
-
-          #pragma omp for nowait
-	  for (Index_type k = kbeg; k < kend; ++k ) {
-	    for (Index_type j = jbeg; j < jend; ++j ) {
-	      HYDRO_2D_BODY1;
-	    }
-	  }
-
-          #pragma omp for nowait
-	  for (Index_type k = kbeg; k < kend; ++k ) {
-	    for (Index_type j = jbeg; j < jend; ++j ) {
-	      HYDRO_2D_BODY2;
-	    }
-	  }
-
-          #pragma omp for nowait
-	  for (Index_type k = kbeg; k < kend; ++k ) {
-	    for (Index_type j = jbeg; j < jend; ++j ) {
-	      HYDRO_2D_BODY3;
-	    }
-	  }
-
-        } // end omp parallel region
-
-      }
-      stopTimer();
-
-      break;
-    }
-
-    case Lambda_OpenMP : {
-
-      startTimer();
-      for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
-
-        #pragma omp parallel
-        {
-
-          #pragma omp for nowait
-          for (Index_type k = kbeg; k < kend; ++k ) {
-            for (Index_type j = jbeg; j < jend; ++j ) {
-              hydro2d_base_lam1(k, j);
-            }
-          }
-
-          #pragma omp for nowait
-          for (Index_type k = kbeg; k < kend; ++k ) {
-            for (Index_type j = jbeg; j < jend; ++j ) {
-              hydro2d_base_lam2(k, j);
-            }
-          }
-
-          #pragma omp for nowait
-          for (Index_type k = kbeg; k < kend; ++k ) {
-            for (Index_type j = jbeg; j < jend; ++j ) {
-              hydro2d_base_lam3(k, j);
-            }
-          }
-
-        } // end omp parallel region
-
-      }
-      stopTimer();
-
-      break;
-    }
 
     case RAJA_OpenMP : {
+
+      using EXECPOL =
+        RAJA::KernelPolicy<
+          RAJA::statement::For<0, RAJA::omp_for_nowait_exec,  // k
+            RAJA::statement::For<1, RAJA::loop_exec,  // j
+              RAJA::statement::Lambda<0>
+            >
+          >
+        >;
+
+      startTimer();
+      for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
+
+        RAJA::region<RAJA::omp_parallel_region>( [=]() {
+
+          RAJA::kernel<EXECPOL>(
+                       RAJA::make_tuple( RAJA::RangeSegment(kbeg, kend),
+                                         RAJA::RangeSegment(jbeg, jend)),
+                       hydro2d_lam1); 
+
+          RAJA::kernel<EXECPOL>(
+                       RAJA::make_tuple( RAJA::RangeSegment(kbeg, kend),
+                                         RAJA::RangeSegment(jbeg, jend)),
+                       hydro2d_lam2); 
+
+          RAJA::kernel<EXECPOL>(
+                       RAJA::make_tuple( RAJA::RangeSegment(kbeg, kend),
+                                         RAJA::RangeSegment(jbeg, jend)),
+                       hydro2d_lam3); 
+
+        }); // end omp parallel region 
+
+      }
+      stopTimer();
+
+      break;
+    }
+
+    case Hand_Opt : {
+
+      using EXECPOL =
+        RAJA::KernelPolicy<
+          RAJA::statement::For<0, RAJA::omp_for_nowait_exec,  // k
+            RAJA::statement::For<1, RAJA::loop_exec,  // j
+              RAJA::statement::Lambda<0>
+            >
+          >
+        >;
+
+      startTimer();
+      for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
+
+        RAJA::region<RAJA::omp_parallel_region>( [=]() {
+
+          RAJA::kernel<EXECPOL>(
+                       RAJA::make_tuple( RAJA::RangeSegment(kbeg, kend),
+                                         RAJA::RangeSegment(jbeg, jend)),
+                       hydro2d_lam1); 
+
+          RAJA::kernel<EXECPOL>(
+                       RAJA::make_tuple( RAJA::RangeSegment(kbeg, kend),
+                                         RAJA::RangeSegment(jbeg, jend)),
+                       hydro2d_lam2); 
+
+          RAJA::kernel<EXECPOL>(
+                       RAJA::make_tuple( RAJA::RangeSegment(kbeg, kend),
+                                         RAJA::RangeSegment(jbeg, jend)),
+                       hydro2d_lam3); 
+
+        }); // end omp parallel region 
+
+      }
+      stopTimer();
+
+      break;
+    }
+
+    case LC_Fused : {
+
+      using EXECPOL =
+        RAJA::KernelPolicy<
+          RAJA::statement::For<0, RAJA::omp_for_nowait_exec,  // k
+            RAJA::statement::For<1, RAJA::loop_exec,  // j
+              RAJA::statement::Lambda<0>
+            >
+          >
+        >;
+
+      startTimer();
+      for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
+
+        RAJA::region<RAJA::omp_parallel_region>( [=]() {
+
+          RAJA::kernel<EXECPOL>(
+                       RAJA::make_tuple( RAJA::RangeSegment(kbeg, kend),
+                                         RAJA::RangeSegment(jbeg, jend)),
+                       hydro2d_lam1); 
+
+          RAJA::kernel<EXECPOL>(
+                       RAJA::make_tuple( RAJA::RangeSegment(kbeg, kend),
+                                         RAJA::RangeSegment(jbeg, jend)),
+                       hydro2d_lam2); 
+
+          RAJA::kernel<EXECPOL>(
+                       RAJA::make_tuple( RAJA::RangeSegment(kbeg, kend),
+                                         RAJA::RangeSegment(jbeg, jend)),
+                       hydro2d_lam3); 
+
+        }); // end omp parallel region 
+
+      }
+      stopTimer();
+
+      break;
+    }
+
+    case LC_Tiled : {
 
       using EXECPOL =
         RAJA::KernelPolicy<
