@@ -43,14 +43,17 @@
 #define POLYBENCH_HEAT_3D_DATA_SETUP \
   Real_ptr A = m_Ainit; \
   Real_ptr B = m_Binit; \
+  Real_ptr C = m_Cinit; \
   const Index_type N = m_N; \
   const Index_type tsteps = m_tsteps;
 
 #define POLYBENCH_HEAT_3D_DATA_RESET \
   m_Ainit = m_A; \
   m_Binit = m_B; \
+  m_Cinit = m_C; \
   m_A = A; \
-  m_B = B;
+  m_B = B; \
+  m_C = C; \
 
 
 #define POLYBENCH_HEAT_3D_BODY1 \
@@ -87,15 +90,29 @@
              0.125*( Bview(i,j+1,k) - 2.0*Bview(i,j,k) + Bview(i,j-1,k) ) + \
              0.125*( Bview(i,j,k+1) - 2.0*Bview(i,j,k) + Bview(i,j,k-1) ) + \
              Bview(i,j,k);
-
+#define POLYBENCH_HEAT_3D_A_INTO_B \
+   Bview(i,j,k) = \
+             0.125*( Aview(i+1,j,k) - 2.0*Aview(i,j,k) + Aview(i-1,j,k) ) + \
+             0.125*( Aview(i,j+1,k) - 2.0*Aview(i,j,k) + Aview(i,j-1,k) ) + \
+             0.125*( Aview(i,j,k+1) - 2.0*Aview(i,j,k) + Aview(i,j,k-1) ) + \
+             Aview(i,j,k);
+          
+#define POLYBENCH_HEAT_3D_B_INTO_C \
+  Cview(i,j,k) = \
+             0.125*( Bview(i+1,j,k) - 2.0*Bview(i,j,k) + Bview(i-1,j,k) ) + \
+             0.125*( Bview(i,j+1,k) - 2.0*Bview(i,j,k) + Bview(i,j-1,k) ) + \
+             0.125*( Bview(i,j,k+1) - 2.0*Bview(i,j,k) + Bview(i,j,k-1) ) + \
+             Bview(i,j,k);
+#define POLYBENCH_HEAT_3D_COPY_C \
+  Aview(i,j,k) = Cview(i,j,k)
 
 #define POLYBENCH_HEAT_3D_VIEWS_RAJA \
 using VIEW_TYPE = RAJA::View<Real_type, \
                              RAJA::Layout<3, Index_type, 2>>; \
 \
   VIEW_TYPE Aview(A, RAJA::Layout<3>(N, N, N)); \
-  VIEW_TYPE Bview(B, RAJA::Layout<3>(N, N, N));
-
+  VIEW_TYPE Bview(B, RAJA::Layout<3>(N, N, N)); \
+  VIEW_TYPE Cview(C, RAJA::Layout<3>(N, N, N));
 
 #include "common/KernelBase.hpp"
 
@@ -133,8 +150,10 @@ private:
 
   Real_ptr m_A;
   Real_ptr m_B;
+  Real_ptr m_C;
   Real_ptr m_Ainit;
   Real_ptr m_Binit;
+  Real_ptr m_Cinit;
 };
 
 } // end namespace polybench

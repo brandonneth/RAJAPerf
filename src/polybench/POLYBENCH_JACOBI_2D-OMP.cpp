@@ -137,7 +137,7 @@ void POLYBENCH_JACOBI_2D::runOpenMPVariant(VariantID vid)
       break;
     }
 
-    case LC_Tiled : {
+    case LoopChain : {
 
       using EXEC_POL =
         RAJA::KernelPolicy<
@@ -172,44 +172,7 @@ void POLYBENCH_JACOBI_2D::runOpenMPVariant(VariantID vid)
       break;
     }
 
-    case LC_Fused : {
-
-      using EXEC_POL =
-        RAJA::KernelPolicy<
-          RAJA::statement::For<0, RAJA::omp_parallel_for_exec,
-            RAJA::statement::For<1, RAJA::loop_exec,
-              RAJA::statement::Lambda<0>
-            >
-          >,
-          RAJA::statement::For<0, RAJA::omp_parallel_for_exec,
-            RAJA::statement::For<1, RAJA::loop_exec,
-              RAJA::statement::Lambda<1>
-            >
-          >
-        >;
-
-      startTimer();
-      for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
-
-        for (Index_type t = 0; t < tsteps; ++t) {
-
-          RAJA::kernel<EXEC_POL>( RAJA::make_tuple(RAJA::RangeSegment{1, N-1},
-                                                   RAJA::RangeSegment{1, N-1}),
-
-	    poly_jacobi2d_lam1,
-	    poly_jacobi2d_lam2
-          );
-
-        }
-
-      }
-      stopTimer();
-
-      POLYBENCH_JACOBI_2D_DATA_RESET;
-
-      break;
-    }
-
+  
     default : {
       std::cout << "\n  POLYBENCH_JACOBI_2D : Unknown variant id = " << vid << std::endl;
     }

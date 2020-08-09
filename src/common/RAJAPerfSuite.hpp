@@ -138,8 +138,7 @@ enum VariantID {
 #if defined(RAJA_ENABLE_OPENMP) && defined(RUN_OPENMP)
   RAJA_OpenMP = 0,
   Hand_Opt,
-  LC_Fused,
-  LC_Tiled,
+  LoopChain,
 #endif
 #if defined(RAJA_ENABLE_TARGET_OPENMP)  
   Base_OpenMPTarget,

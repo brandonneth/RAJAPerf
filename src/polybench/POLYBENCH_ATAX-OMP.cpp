@@ -163,7 +163,7 @@ void POLYBENCH_ATAX::runOpenMPVariant(VariantID vid)
       
       break;
     }
-    case LC_Fused : {
+    case LoopChain : {
 
       using EXEC_POL1 =
         RAJA::KernelPolicy<
@@ -218,61 +218,7 @@ void POLYBENCH_ATAX::runOpenMPVariant(VariantID vid)
       
       break;
     }
-    case LC_Tiled : {
-
-      using EXEC_POL1 =
-        RAJA::KernelPolicy<
-          RAJA::statement::For<0, RAJA::omp_parallel_for_exec,
-            RAJA::statement::Lambda<0>,
-            RAJA::statement::For<1, RAJA::loop_exec,
-              RAJA::statement::Lambda<1>
-             >,
-            RAJA::statement::Lambda<2>
-          >
-        >;
-
-      using EXEC_POL2 =
-        RAJA::KernelPolicy<
-          RAJA::statement::For<1, RAJA::omp_parallel_for_exec,
-            RAJA::statement::Lambda<0>,
-            RAJA::statement::For<0, RAJA::loop_exec,
-              RAJA::statement::Lambda<1>
-            >,
-            RAJA::statement::Lambda<2>
-          >
-        >;
-
-      
-      startTimer();
-      for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
-       
-        RAJA::kernel_param<EXEC_POL1>(
-          RAJA::make_tuple(RAJA::RangeSegment{0, N},
-                           RAJA::RangeSegment{0, N}),
-          RAJA::make_tuple(static_cast<Real_type>(0.0)),
-
-          poly_atax_lam1,
-          poly_atax_lam2,
-          poly_atax_lam3
-
-        );
-
-        RAJA::kernel_param<EXEC_POL2>(
-          RAJA::make_tuple(RAJA::RangeSegment{0, N},
-                           RAJA::RangeSegment{0, N}),
-          RAJA::make_tuple(static_cast<Real_type>(0.0)),
-
-          poly_atax_lam4,
-          poly_atax_lam5,
-          poly_atax_lam6
-
-        ); 
-
-      }
-      stopTimer();
-      
-      break;
-    }
+ 
 
     default : {
       std::cout << "\n  POLYBENCH_ATAX : Unknown variant id = " << vid << std::endl;

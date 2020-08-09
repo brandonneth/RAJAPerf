@@ -98,31 +98,7 @@ void POLYBENCH_JACOBI_1D::runOpenMPVariant(VariantID vid)
 
       break;
     }   
-    case LC_Fused : {
-
-      auto seg = RAJA::RangeSegment(1,N-1);
-      auto knl1 = RAJA::make_forall<RAJA::omp_parallel_for_exec> (seg, lam1);
-      auto knl2 = RAJA::make_forall<RAJA::omp_parallel_for_exec> (seg, lam2);
-      auto knl3 = RAJA::make_forall<RAJA::omp_parallel_for_exec> (seg, lam3);
-           
-      startTimer();
-      for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
-
-        for (Index_type t = 0; t < tsteps; ++t) {
-
-          knl1();
-          knl2();
-          knl3();
-        }
-
-      }
-      stopTimer();
-
-      POLYBENCH_JACOBI_1D_DATA_RESET;
-
-      break;
-    }   
-    case LC_Tiled : {
+    case LoopChain : {
       auto seg = RAJA::RangeSegment(1,N-1);
       auto knl1 = RAJA::make_forall<RAJA::omp_parallel_for_exec> (seg, lam1);
       auto knl2 = RAJA::make_forall<RAJA::omp_parallel_for_exec> (seg, lam2);
