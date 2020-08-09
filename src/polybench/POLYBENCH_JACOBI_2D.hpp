@@ -30,6 +30,7 @@
 #define POLYBENCH_JACOBI_2D_DATA_SETUP \
   Real_ptr A = m_Ainit; \
   Real_ptr B = m_Binit; \
+  Real_ptr C = m_Cinit; \
 \
   const Index_type N = m_N; \
   const Index_type tsteps = m_tsteps;
@@ -37,8 +38,10 @@
 #define POLYBENCH_JACOBI_2D_DATA_RESET \
   m_Ainit = m_A; \
   m_Binit = m_B; \
+  m_Cinit = m_C; \
   m_A = A; \
-  m_B = B;
+  m_B = B; \
+  m_C = C;
 
 
 #define POLYBENCH_JACOBI_2D_BODY1 \
@@ -54,14 +57,22 @@
 #define POLYBENCH_JACOBI_2D_BODY2_RAJA \
   Aview(i,j) = 0.2 * (Bview(i,j) + Bview(i,j-1) + Bview(i,j+1) + Bview(i+1,j) + Bview(i-1,j));
 
+#define POLYBENCH_JACOBI_2D_A2B \
+  Bview(i,j) = 0.2 * (Aview(i,j) + Aview(i,j-1) + Aview(i,j+1) + Aview(i+1,j) + Aview(i-1,j));
+
+#define POLYBENCH_JACOBI_2D_B2C \
+  Cview(i,j) = 0.2 * (Bview(i,j) + Bview(i,j-1) + Bview(i,j+1) + Bview(i+1,j) + Bview(i-1,j));
+
+#define POLYBENCH_JACOBI_2D_C2A \
+  Aview(i,j) = Cview(i,j);
 
 #define POLYBENCH_JACOBI_2D_VIEWS_RAJA \
 using VIEW_TYPE = RAJA::View<Real_type, \
                              RAJA::Layout<2, Index_type, 1>>; \
 \
   VIEW_TYPE Aview(A, RAJA::Layout<2>(N, N)); \
-  VIEW_TYPE Bview(B, RAJA::Layout<2>(N, N));
-
+  VIEW_TYPE Bview(B, RAJA::Layout<2>(N, N)); \
+  VIEW_TYPE Cview(C, RAJA::Layout<2>(N, N));
 
 #include "common/KernelBase.hpp"
 
@@ -97,8 +108,10 @@ private:
 
   Real_ptr m_A;
   Real_ptr m_B;
+  Real_ptr m_C;
   Real_ptr m_Ainit;
   Real_ptr m_Binit;
+  Real_ptr m_Cinit;
 };
 
 } // end namespace polybench
