@@ -34,6 +34,16 @@ void POLYBENCH_JACOBI_1D::runOpenMPVariant(VariantID vid)
                               POLYBENCH_JACOBI_1D_BODY2;
                             };
 
+  auto lam1 =  [=] (auto i) {
+                 POLYBENCH_JACOBI_1D_A2B;
+               };
+  auto lam2 =  [=] (auto i) {
+                 POLYBENCH_JACOBI_1D_B2C;
+               };
+  auto lam3 =  [=] (auto i) {
+                 POLYBENCH_JACOBI_1D_C2A;
+               };
+
   switch ( vid ) {
 
     case RAJA_OpenMP : {
@@ -68,11 +78,15 @@ void POLYBENCH_JACOBI_1D::runOpenMPVariant(VariantID vid)
         for (Index_type t = 0; t < tsteps; ++t) {
 
           RAJA::forall<RAJA::omp_parallel_for_exec> (RAJA::RangeSegment{1, N-1},
-            poly_jacobi1d_lam1
+            lam1
           );
 
           RAJA::forall<RAJA::omp_parallel_for_exec> (RAJA::RangeSegment{1, N-1},
-            poly_jacobi1d_lam2
+            lam2
+          );
+        
+          RAJA::forall<RAJA::omp_parallel_for_exec> (RAJA::RangeSegment{1, N-1},
+            lam3
           );
 
         }
@@ -86,19 +100,19 @@ void POLYBENCH_JACOBI_1D::runOpenMPVariant(VariantID vid)
     }   
     case LC_Fused : {
 
+      auto seg = RAJA::RangeSegment(1,N-1);
+      auto knl1 = RAJA::make_forall<RAJA::omp_parallel_for_exec> (seg, lam1);
+      auto knl2 = RAJA::make_forall<RAJA::omp_parallel_for_exec> (seg, lam2);
+      auto knl3 = RAJA::make_forall<RAJA::omp_parallel_for_exec> (seg, lam3);
+           
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
 
         for (Index_type t = 0; t < tsteps; ++t) {
 
-          RAJA::forall<RAJA::omp_parallel_for_exec> (RAJA::RangeSegment{1, N-1},
-            poly_jacobi1d_lam1
-          );
-
-          RAJA::forall<RAJA::omp_parallel_for_exec> (RAJA::RangeSegment{1, N-1},
-            poly_jacobi1d_lam2
-          );
-
+          knl1();
+          knl2();
+          knl3();
         }
 
       }
@@ -109,20 +123,19 @@ void POLYBENCH_JACOBI_1D::runOpenMPVariant(VariantID vid)
       break;
     }   
     case LC_Tiled : {
-
+      auto seg = RAJA::RangeSegment(1,N-1);
+      auto knl1 = RAJA::make_forall<RAJA::omp_parallel_for_exec> (seg, lam1);
+      auto knl2 = RAJA::make_forall<RAJA::omp_parallel_for_exec> (seg, lam2);
+      auto knl3 = RAJA::make_forall<RAJA::omp_parallel_for_exec> (seg, lam3);
+           
+      auto tiledKnl = RAJA::overlapped_tile_no_fuse<512*2*2*2>(knl1,knl2);
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
 
         for (Index_type t = 0; t < tsteps; ++t) {
 
-          RAJA::forall<RAJA::omp_parallel_for_exec> (RAJA::RangeSegment{1, N-1},
-            poly_jacobi1d_lam1
-          );
-
-          RAJA::forall<RAJA::omp_parallel_for_exec> (RAJA::RangeSegment{1, N-1},
-            poly_jacobi1d_lam2
-          );
-
+          tiledKnl();
+          knl3();
         }
 
       }
