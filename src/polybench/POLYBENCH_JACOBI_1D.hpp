@@ -24,24 +24,36 @@
 #define RAJAPerf_POLYBENCH_JACOBI_1D_HPP
 
 #define POLYBENCH_JACOBI_1D_DATA_SETUP \
-  Real_ptr A = m_Ainit; \
-  Real_ptr B = m_Binit; \
-  const Index_type N = m_N; \
+  using ViewType = RAJA::View<Real_type, RAJA::Layout<1, Index_type, 1>>; \
+  ViewType A(m_Ainit, m_N);\
+  ViewType B(m_Binit, m_N);\
+  ViewType C(m_Cinit, m_N);\
+  const Index_type N = getRunSize(); \
   const Index_type tsteps = m_tsteps;
 
 #define POLYBENCH_JACOBI_1D_DATA_RESET \
   m_Ainit = m_A; \
   m_Binit = m_B; \
-  m_A = A; \
-  m_B = B;
+  m_Cinit = m_C; \
+  m_A = A.data; \
+  m_B = B.data; \
+  m_C = C.data;
 
 
 #define POLYBENCH_JACOBI_1D_BODY1 \
-  B[i] = 0.33333 * (A[i-1] + A[i] + A[i + 1]);  
+  B(i) = 0.33333 * (A(i-1) + A(i) + A(i+1));  
 
 #define POLYBENCH_JACOBI_1D_BODY2 \
-  A[i] = 0.33333 * (B[i-1] + B[i] + B[i + 1]);
+  A(i) = 0.33333 * (B(i-1) + B(i) + B(i+1));
 
+#define POLYBENCH_JACOBI_1D_A2B \
+  B(i) = 0.33333 * (A(i-1) + A(i) + A(i+1));
+
+#define POLYBENCH_JACOBI_1D_B2C \
+  C(i) = 0.33333 * (B(i-1) + B(i) + B(i+1));
+
+#define POLYBENCH_JACOBI_1D_C2A \
+  A(i) = C(i);
 
 #include "common/KernelBase.hpp"
 
@@ -77,8 +89,10 @@ private:
 
   Real_ptr m_A;
   Real_ptr m_B;
+  Real_ptr m_C;
   Real_ptr m_Ainit;
   Real_ptr m_Binit;
+  Real_ptr m_Cinit;
 };
 
 } // end namespace polybench

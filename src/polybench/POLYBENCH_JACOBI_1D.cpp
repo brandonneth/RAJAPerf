@@ -56,7 +56,7 @@ POLYBENCH_JACOBI_1D::POLYBENCH_JACOBI_1D(const RunParams& params)
       break;
   }
 
-  setDefaultSize( m_tsteps * 2 * m_N );
+  setDefaultSize( m_N );
   setDefaultReps(run_reps);
 }
 
@@ -68,10 +68,12 @@ POLYBENCH_JACOBI_1D::~POLYBENCH_JACOBI_1D()
 void POLYBENCH_JACOBI_1D::setUp(VariantID vid)
 {
   (void) vid;
-  allocAndInitData(m_Ainit, m_N, vid);
-  allocAndInitData(m_Binit, m_N, vid);
-  allocAndInitDataConst(m_A, m_N, 0.0, vid);
-  allocAndInitDataConst(m_B, m_N, 0.0, vid);
+  allocAndInitData(m_Ainit, getRunSize(), vid);
+  allocAndInitData(m_Binit, getRunSize(), vid);
+  allocAndInitData(m_Cinit, getRunSize(), vid);
+  allocAndInitDataConst(m_A, getRunSize(), 0.0, vid);
+  allocAndInitDataConst(m_B, getRunSize(), 0.0, vid);
+  allocAndInitDataConst(m_C, getRunSize(), 0.0, vid);
 }
 
 void POLYBENCH_JACOBI_1D::updateChecksum(VariantID vid)
