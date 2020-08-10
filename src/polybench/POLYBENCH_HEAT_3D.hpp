@@ -90,20 +90,20 @@
              0.125*( Bview(i,j+1,k) - 2.0*Bview(i,j,k) + Bview(i,j-1,k) ) + \
              0.125*( Bview(i,j,k+1) - 2.0*Bview(i,j,k) + Bview(i,j,k-1) ) + \
              Bview(i,j,k);
-#define POLYBENCH_HEAT_3D_A_INTO_B \
+#define POLYBENCH_HEAT_3D_A2B \
    Bview(i,j,k) = \
              0.125*( Aview(i+1,j,k) - 2.0*Aview(i,j,k) + Aview(i-1,j,k) ) + \
              0.125*( Aview(i,j+1,k) - 2.0*Aview(i,j,k) + Aview(i,j-1,k) ) + \
              0.125*( Aview(i,j,k+1) - 2.0*Aview(i,j,k) + Aview(i,j,k-1) ) + \
              Aview(i,j,k);
           
-#define POLYBENCH_HEAT_3D_B_INTO_C \
+#define POLYBENCH_HEAT_3D_B2C \
   Cview(i,j,k) = \
              0.125*( Bview(i+1,j,k) - 2.0*Bview(i,j,k) + Bview(i-1,j,k) ) + \
              0.125*( Bview(i,j+1,k) - 2.0*Bview(i,j,k) + Bview(i,j-1,k) ) + \
              0.125*( Bview(i,j,k+1) - 2.0*Bview(i,j,k) + Bview(i,j,k-1) ) + \
              Bview(i,j,k);
-#define POLYBENCH_HEAT_3D_COPY_C \
+#define POLYBENCH_HEAT_3D_C2A \
   Aview(i,j,k) = Cview(i,j,k)
 
 #define POLYBENCH_HEAT_3D_VIEWS_RAJA \

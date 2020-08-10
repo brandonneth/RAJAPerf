@@ -73,18 +73,54 @@ void POLYBENCH_JACOBI_1D::runOpenMPVariant(VariantID vid)
     case Hand_Opt: {
 
       startTimer();
+
+      auto initialSeg = RAJA::RangeSegment{1,N-1};
+      
+      //we shift the initial segment forward 1 for the second loop
+      auto shiftedSeg = RAJA::RangeSegment{2,N};
+
+      auto lam2_shifted = [=](auto i) {
+        C(i-1) = 0.33333 * ( B(i-2) + B(i-1) + B(i) );
+      };
+      
+      auto overlapSeg = RAJA::RangeSegment(2,N-1);
+      
+      int tileSize = 2048;
+      int numTiles = ((N-3) / tileSize) + 1;
+      auto tiledLam = [=](int tileNum) {
+        int start = tileNum*tileSize + 2;
+        int end = (tileNum+1) * tileSize + 2;
+      
+        int start1 = start - 2;
+        
+        if(start1 < 2) { start1 = 2;} 
+        if(end > N-1) { end = N -1;}
+        auto tileSeg1 = RAJA::RangeSegment(start1, end);
+        auto tileSeg2 = RAJA::RangeSegment(start, end);
+        RAJA::forall<RAJA::loop_exec>(tileSeg1, lam1);
+        RAJA::forall<RAJA::loop_exec>(tileSeg2, lam2_shifted);
+ 
+      };
+      
+   
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
 
         for (Index_type t = 0; t < tsteps; ++t) {
 
-          RAJA::forall<RAJA::omp_parallel_for_exec> (RAJA::RangeSegment{1, N-1},
-            lam1
-          );
+          //pre-overlap
+          lam1(1);
 
-          RAJA::forall<RAJA::omp_parallel_for_exec> (RAJA::RangeSegment{1, N-1},
-            lam2
-          );
+          RAJA::forall<RAJA::omp_parallel_for_exec>(RAJA::RangeSegment(0,numTiles), tiledLam);
+          for(int tileNum = 0; tileNum < numTiles; tileNum++) {
+            //tiledLam(tileNum);
+           
+          }
+          // RAJA::forall<RAJA::omp_parallel_for_exec> (overlapSeg, lam1);
+
+          //RAJA::forall<RAJA::omp_parallel_for_exec> (overlapSeg, lam2_shifted);
         
+          lam2_shifted(N-1);
+
           RAJA::forall<RAJA::omp_parallel_for_exec> (RAJA::RangeSegment{1, N-1},
             lam3
           );
