@@ -14,7 +14,7 @@ def stencil_eval():
 	outfile_option = '--outfile ' + prefix
 	kernels_option = '--kernels ' + kernels
 
-	command_string = " ".join(['.bin/raja-perf.exe', passes_option, size_option, outfile_option, kernels_option])
+	command_string = " ".join(['./bin/raja-perf.exe', passes_option, size_option, outfile_option, kernels_option])
 
 	return command_string
 
