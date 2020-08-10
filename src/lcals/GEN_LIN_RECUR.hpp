@@ -32,10 +32,11 @@
 
 
 #define GEN_LIN_RECUR_DATA_SETUP \
-  Real_ptr b5 = m_b5; \
-  Real_ptr sa = m_sa; \
-  Real_ptr sb = m_sb; \
-  Real_ptr stb5 = m_stb5; \
+  using VIEW = RAJA::View<Real_type, RAJA::Layout<1, Index_type, 1>>; \
+  VIEW b5(m_b5, m_N); \
+  VIEW sa(m_sa, m_N); \
+  VIEW sb(m_sb,m_N); \
+  VIEW stb5(m_stb5,m_N); \
 \
   Index_type kb5i = m_kb5i; \
   Index_type N = m_N;
@@ -48,6 +49,15 @@
   Index_type k = N - i ; \
   b5[k+kb5i] = sa[k] + stb5[k]*sb[k]; \
   stb5[k] = b5[k+kb5i] - stb5[k];
+
+#define GEN_LIN_RECUR_RAJA_BODY1  \
+  b5(k+kb5i) = sa(k) + stb5(k)*sb(k); \
+  stb5(k) = b5(k+kb5i) - stb5(k);
+
+#define GEN_LIN_RECUR_RAJA_BODY2  \
+  Index_type k = N - i ; \
+  b5(k+kb5i) = sa(k) + stb5(k)*sb(k); \
+  stb5(k) = b5(k+kb5i) - stb5(k);
 
 
 #include "common/KernelBase.hpp"

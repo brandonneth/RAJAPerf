@@ -76,7 +76,7 @@ void PRESSURE::runOpenMPVariant(VariantID vid)
       break;
     }
 
-    case LC_Fused : {
+    case LoopChain : {
       using EPol = RAJA::omp_parallel_for_exec;
       auto seg = RAJA::RangeSegment(ibegin, iend);
       auto knl1 = RAJA::make_forall<EPol>(seg, pressure_lam1);
@@ -86,27 +86,6 @@ void PRESSURE::runOpenMPVariant(VariantID vid)
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
         fusedKnl();
-      }
-      stopTimer();
-
-      break;
-    }
-
-    case LC_Tiled : {
-
-      startTimer();
-      for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
-
-        RAJA::region<RAJA::omp_parallel_region>( [=]() {
-
-          RAJA::forall<RAJA::omp_for_nowait_exec>(
-            RAJA::RangeSegment(ibegin, iend), pressure_lam1);
-
-          RAJA::forall<RAJA::omp_for_nowait_exec>(
-            RAJA::RangeSegment(ibegin, iend), pressure_lam2);
-
-        }); // end omp parallel region
-
       }
       stopTimer();
 

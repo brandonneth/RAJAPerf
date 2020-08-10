@@ -119,8 +119,7 @@ static const std::string VariantNames [] =
 #if defined(RAJA_ENABLE_OPENMP) && defined(RUN_OPENMP)
   std::string("RAJA_OpenMP"),
   std::string("Hand_Opt"),
-  std::string("LC_Fused"),
-  std::string("LC_Tiled"),
+  std::string("LoopChain"),
 #endif
 
 #if defined(RAJA_ENABLE_TARGET_OPENMP)  

@@ -88,8 +88,7 @@ void KernelBase::runKernel(VariantID vid)
 #if defined(RAJA_ENABLE_OPENMP) && defined(RUN_OPENMP)
     case RAJA_OpenMP :
     case Hand_Opt :
-    case LC_Fused :
-    case LC_Tiled :
+    case LoopChain :
     {
       runOpenMPVariant(vid);
       break;

@@ -26,11 +26,11 @@ void GEN_LIN_RECUR::runOpenMPVariant(VariantID vid)
 
   GEN_LIN_RECUR_DATA_SETUP;
 
-  auto genlinrecur_lam1 = [=](Index_type k) {
-                            GEN_LIN_RECUR_BODY1;
+  auto genlinrecur_lam1 = [=](auto k) {
+                            GEN_LIN_RECUR_RAJA_BODY1;
                           };
-  auto genlinrecur_lam2 = [=](Index_type i) {
-                            GEN_LIN_RECUR_BODY2;
+  auto genlinrecur_lam2 = [=](auto i) {
+                            GEN_LIN_RECUR_RAJA_BODY2;
                           };
 
   switch ( vid ) {
@@ -59,27 +59,10 @@ void GEN_LIN_RECUR::runOpenMPVariant(VariantID vid)
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
 
         RAJA::forall<RAJA::omp_parallel_for_exec>(
-          RAJA::RangeSegment(0, N), genlinrecur_lam1);
-
-        RAJA::forall<RAJA::omp_parallel_for_exec>(
-          RAJA::RangeSegment(1, N+1), genlinrecur_lam2);
-
-      }
-      stopTimer();
-
-      break;
-    }
-
-    case LC_Fused : {
-
-      startTimer();
-      for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
-
-        RAJA::forall<RAJA::omp_parallel_for_exec>(
-          RAJA::RangeSegment(0, N), genlinrecur_lam1);
-
-        RAJA::forall<RAJA::omp_parallel_for_exec>(
-          RAJA::RangeSegment(1, N+1), genlinrecur_lam2);
+          RAJA::RangeSegment(0, N),  [=](auto k) {
+                            GEN_LIN_RECUR_RAJA_BODY1;
+                            GEN_LIN_RECUR_RAJA_BODY1;
+                          });
 
       }
       stopTimer();
@@ -87,17 +70,19 @@ void GEN_LIN_RECUR::runOpenMPVariant(VariantID vid)
       break;
     }
 
-    case LC_Tiled : {
+   
+    case LoopChain : {
+      auto knl1 = RAJA::make_forall<RAJA::omp_parallel_for_exec>(
+          RAJA::RangeSegment(0, N), genlinrecur_lam1);
+      auto knl2 = RAJA::make_forall<RAJA::omp_parallel_for_exec>(
+          RAJA::RangeSegment(1, N+1), genlinrecur_lam1);
+
+      auto fusedKnl = RAJA::fuse(knl1, knl2);
 
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
-
-        RAJA::forall<RAJA::omp_parallel_for_exec>(
-          RAJA::RangeSegment(0, N), genlinrecur_lam1);
-
-        RAJA::forall<RAJA::omp_parallel_for_exec>(
-          RAJA::RangeSegment(1, N+1), genlinrecur_lam2);
-
+        fusedKnl();
+        
       }
       stopTimer();
 
