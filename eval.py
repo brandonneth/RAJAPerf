@@ -3,21 +3,19 @@ import os
 import subprocess
 
 
-#returns the string of the output file name,
-# made so its easy to parse later
-def outfile_name(sizefact, repfact, passes):
-	noFileExt = "_".join(("Results", str(sizefact), str(repfact), str(passes)))
-	return noFileExt
-#returns the command that, run from the build directory, 
-#runs the suite with the arguments provided
-def command_string(sizefact, repfact, passes=1):
-	executable = "./bin/raja-perf.exe"
-	size_option = "--sizefact " + str(sizefact)
-	rep_option = "--repfact " + str(repfact)
-	pass_option = "--npasses " + str(passes)
-	outfile_option = "--outfile " + outfile_name(sizefact,repfact,passes)
-	return " ".join((executable, size_option, rep_option, pass_option, outfile_option))
+def stencil_eval():
+	num_passes = 10
+	size = 'extralarge'
+	kernels = "JACOBI_1D JACOBI_2D HEAT_3D HYDRO_2D FDTD_2D"
+	prefix = 'Stencils'
 
+	passes_option = '--npasses ' + str(num_passes)
+	size_option = '--sizespec ' + size
+	outfile_option = '--outfile ' + prefix
+	kernels_option = '--kernels ' + kernels
 
+	command_string = " ".join(['.bin/raja-perf.exe', passes_option, size_option, outfile_option, kernels_option])
 
+	return command_string
 
+print(stencil_eval())
