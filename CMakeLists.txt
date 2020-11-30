@@ -18,17 +18,18 @@ this, and all other variants, to run _only_ raw C loops." On)
 #
 
 if (PERFSUITE_ENABLE_WARNINGS)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Werror")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Werror -fconcepts-ts")
 endif()
 
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fconcepts-ts")
 set(ENABLE_TESTS Off CACHE BOOL "Enable BLT and RAJA tests")
 set(ENABLE_EXAMPLES Off CACHE BOOL "Enable RAJA examples")
 set(ENABLE_EXERCISES Off CACHE BOOL "Enable RAJA exercises")
 
 include(blt/SetupBLT.cmake)
 
-set(CMAKE_CXX_STANDARD 11)
-set(BLT_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
+set(BLT_CXX_STANDARD 17)
 
 #
 # Define RAJA settings...
@@ -48,10 +49,10 @@ set(RAJA_DATA_ALIGN 64)
 
 
 # exclude RAJA make targets from top-level build...
-add_subdirectory(tpl/RAJA)
 
-get_property(RAJA_INCLUDE_DIRS DIRECTORY tpl/RAJA PROPERTY INCLUDE_DIRECTORIES)
-include_directories(${RAJA_INCLUDE_DIRS})
+add_subdirectory(../RAJA build)
+#get_property(RAJA_INCLUDE_DIRS DIRECTORY tpl/RAJA PROPERTY INCLUDE_DIRECTORIES)
+#include_directories(${RAJA_INCLUDE_DIRS})
 
 
 #
@@ -109,3 +110,6 @@ set (CUDA_NVCC_FLAGS ${RAJA_NVCC_FLAGS})
 # Each directory in the perf suite has its own CMakeLists.txt file.
 #
 add_subdirectory(src)
+
+
+set(CMAKE_CXX_STANDARD 17)

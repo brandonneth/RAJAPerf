@@ -157,21 +157,16 @@ void POLYBENCH_JACOBI_2D::runOpenMPVariant(VariantID vid)
           RAJA::kernel<EXEC_POL>(
             RAJA::make_tuple(RAJA::RangeSegment(0,numTiles), RAJA::RangeSegment(0,numTiles)), 
             tiledLam); 
-                   //RAJA::kernel<EXEC_POL>(overlapSeg, lam1);
-          //RAJA::kernel<EXEC_POL>(overlapSeg, lam2_shifted);
-          
+                 
           //post-overlap
           RAJA::kernel<EXEC_POL>(RAJA::make_tuple(RAJA::RangeSegment(2,N-1), RAJA::RangeSegment(N-1,N)),lam2_shifted); 
           RAJA::kernel<EXEC_POL>(RAJA::make_tuple(RAJA::RangeSegment(N-1,N), RAJA::RangeSegment(2,N)), lam2_shifted); 
-
-
 
           RAJA::kernel<EXEC_POL>( RAJA::make_tuple(RAJA::RangeSegment{1, N-1},
                                                    RAJA::RangeSegment{1, N-1}),
 
 	    lam3
           );
-
 
         }
 

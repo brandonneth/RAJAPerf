@@ -101,12 +101,10 @@ enum KernelID {
 //
 // Polybench kernels...
 //
-  Polybench_3MM,
-  Polybench_ATAX,
   Polybench_HEAT_3D,
   Polybench_JACOBI_1D,
   Polybench_JACOBI_2D,
-  Polybench_MVT,
+  Polybench_FDTD_2D,
 
 
 //

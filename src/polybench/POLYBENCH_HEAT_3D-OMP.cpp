@@ -146,7 +146,6 @@ void POLYBENCH_HEAT_3D::runOpenMPVariant(VariantID vid)
                 auto seg2 = RAJA::make_tuple(RAJA::RangeSegment(is,ie), RAJA::RangeSegment(js,je), RAJA::RangeSegment(ks,ke));
                 RAJA::kernel<KPol>(seg1, lam1);
                 RAJA::kernel<KPol>(seg2, lam2_shifted);
-
       };
 
       startTimer();
@@ -154,46 +153,24 @@ void POLYBENCH_HEAT_3D::runOpenMPVariant(VariantID vid)
 
         for (Index_type t = 0; t < tsteps; ++t) {
 
-
           //low boundary segments
           RAJA::kernel<KPol>(RAJA::make_tuple(RAJA::RangeSegment(1,2), RAJA::RangeSegment(1,N-1), RAJA::RangeSegment(1,N-1)), lam1);
           RAJA::kernel<KPol>(RAJA::make_tuple(RAJA::RangeSegment(2,N-1), RAJA::RangeSegment(1,2), RAJA::RangeSegment(1,N-1)), lam1);
           RAJA::kernel<KPol>(RAJA::make_tuple(RAJA::RangeSegment(2,N-1), RAJA::RangeSegment(2,N-1), RAJA::RangeSegment(1,2)), lam1);  
           
-          //overlapped ispace
-          for(int iTile = 0; iTile <numTiles; iTile++) {
-            for(int jTile = 0; jTile < numTiles; jTile++) {
-              for(int kTile = 0; kTile < numTiles; kTile++) {
-                //tiled_lam(iTile,jTile,kTile);
-              }
-            }
-          }
-
           RAJA::kernel<KPol>(make_tuple(RAJA::RangeSegment(0,numTiles), RAJA::RangeSegment(0,numTiles), RAJA::RangeSegment(0,numTiles)), tiled_lam);
-          //RAJA::kernel<KPol>(overlapSeg,lam1);
-          //RAJA::kernel<KPol>(overlapSeg, lam2_shifted);
-
+      
           //high boundary segments
           RAJA::kernel<KPol>(RAJA::make_tuple(RAJA::RangeSegment(2,N-1), RAJA::RangeSegment(2,N-1), RAJA::RangeSegment(N-1,N)), lam2_shifted);
           RAJA::kernel<KPol>(RAJA::make_tuple(RAJA::RangeSegment(2,N-1), RAJA::RangeSegment(N-1,N), RAJA::RangeSegment(2,N)), lam2_shifted);
           RAJA::kernel<KPol>(RAJA::make_tuple(RAJA::RangeSegment(N-1,N), RAJA::RangeSegment(2,N), RAJA::RangeSegment(2,N)), lam2_shifted);
 
-
-
-
-
-
-
-
           RAJA::kernel<KPol>( RAJA::make_tuple(RAJA::RangeSegment{1, N-1},
                                                    RAJA::RangeSegment{1, N-1},
                                                    RAJA::RangeSegment{1, N-1}),
-
             lam3         
           );
-
         }
-
       }
       stopTimer();
 
@@ -214,7 +191,6 @@ void POLYBENCH_HEAT_3D::runOpenMPVariant(VariantID vid)
             >
           >
         >;
-
 
       auto seg = RAJA::make_tuple(RAJA::RangeSegment{1, N-1},
                                                    RAJA::RangeSegment{1, N-1},

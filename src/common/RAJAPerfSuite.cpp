@@ -19,12 +19,10 @@
 //
 // Polybench kernels...
 //
-#include "polybench/POLYBENCH_3MM.hpp"
-#include "polybench/POLYBENCH_ATAX.hpp"
 #include "polybench/POLYBENCH_HEAT_3D.hpp"
 #include "polybench/POLYBENCH_JACOBI_1D.hpp"
 #include "polybench/POLYBENCH_JACOBI_2D.hpp"
-#include "polybench/POLYBENCH_MVT.hpp"
+#include "polybench/POLYBENCH_FDTD_2D.hpp"
 
 //
 // Apps kernels...
@@ -82,12 +80,11 @@ static const std::string KernelNames [] =
 //
 // Polybench kernels...
 //
-  std::string("Polybench_3MM"),
-  std::string("Polybench_ATAX"),
   std::string("Polybench_HEAT_3D"),
   std::string("Polybench_JACOBI_1D"),
   std::string("Polybench_JACOBI_2D"),
-  std::string("Polybench_MVT"),
+  std::string("Polybench_FDTD_2D"),
+  
 
 //
 // Apps kernels...
@@ -220,14 +217,6 @@ KernelBase* getKernelObject(KernelID kid,
 //
 // Polybench kernels...
 //
-    case Polybench_3MM : {
-       kernel = new polybench::POLYBENCH_3MM(run_params);
-       break;
-    }
-    case Polybench_ATAX  : {
-       kernel = new polybench::POLYBENCH_ATAX(run_params);
-       break;
-    }
     case Polybench_HEAT_3D : {
        kernel = new polybench::POLYBENCH_HEAT_3D(run_params);
        break;
@@ -240,8 +229,8 @@ KernelBase* getKernelObject(KernelID kid,
        kernel = new polybench::POLYBENCH_JACOBI_2D(run_params);
        break;
     }
-    case Polybench_MVT : {
-       kernel = new polybench::POLYBENCH_MVT(run_params);
+    case Polybench_FDTD_2D : {
+       kernel = new polybench::POLYBENCH_FDTD_2D(run_params);
        break;
     }
 

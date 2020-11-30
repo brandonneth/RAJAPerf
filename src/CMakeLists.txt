@@ -54,9 +54,11 @@ blt_add_executable(
   polybench/POLYBENCH_JACOBI_2D.cpp
   polybench/POLYBENCH_JACOBI_2D-Seq.cpp
   polybench/POLYBENCH_JACOBI_2D-OMPTarget.cpp
-  polybench/POLYBENCH_MVT.cpp
-  polybench/POLYBENCH_MVT-Seq.cpp
-  polybench/POLYBENCH_MVT-OMPTarget.cpp
+  polybench/POLYBENCH_FDTD_2D.cpp
+  polybench/POLYBENCH_FDTD_2D-Seq.cpp
+  polybench/POLYBENCH_FDTD_2D-Cuda.cpp
+  polybench/POLYBENCH_FDTD_2D-OMP.cpp
+  polybench/POLYBENCH_FDTD_2D-OMPTarget.cpp
   common/DataUtils.cpp
   common/Executor.cpp
   common/KernelBase.cpp

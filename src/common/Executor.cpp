@@ -13,7 +13,7 @@
 #include "common/OutputUtils.hpp"
 
 // Warmup kernel to run first to remove startup overheads in timings
-#include "polybench/POLYBENCH_ATAX.hpp"
+#include "polybench/POLYBENCH_JACOBI_2D.hpp"
 
 #include <list>
 #include <vector>
@@ -347,7 +347,7 @@ void Executor::runSuite()
 
   cout << "\n\nRunning warmup kernel variants...\n";
 
-  KernelBase* warmup_kernel = new polybench::POLYBENCH_ATAX(run_params);
+  KernelBase* warmup_kernel = new polybench::POLYBENCH_JACOBI_2D(run_params);
 
   for (size_t iv = 0; iv < variant_ids.size(); ++iv) {
     if ( run_params.showProgress() ) {

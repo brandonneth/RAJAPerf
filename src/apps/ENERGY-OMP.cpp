@@ -17,9 +17,15 @@ namespace rajaperf
 namespace apps
 {
 
+void __attribute__((noinline)) mark();
+void  mark() {
+  asm("");
+  std::cout << " \n";
+}
 
 void ENERGY::runOpenMPVariant(VariantID vid)
 {
+  mark();
 #if defined(RAJA_ENABLE_OPENMP) && defined(RUN_OPENMP)
 
   const Index_type run_reps = getRunReps();
@@ -105,8 +111,11 @@ void ENERGY::runOpenMPVariant(VariantID vid)
       auto seg = RAJA::RangeSegment(ibegin, iend);
 
       auto knl1 = RAJA::make_forall<EPol>(seg, energy_lam1);
+
       auto knl2 = RAJA::make_forall<EPol>(seg, energy_lam2);
+
       auto knl3 = RAJA::make_forall<EPol>(seg, energy_lam3);
+
       auto knl4 = RAJA::make_forall<EPol>(seg, energy_lam4);
       auto knl5 = RAJA::make_forall<EPol>(seg, energy_lam5);
       auto knl6 = RAJA::make_forall<EPol>(seg, energy_lam6);
