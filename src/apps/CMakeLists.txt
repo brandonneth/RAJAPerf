@@ -14,6 +14,11 @@ blt_add_library(
           ENERGY-Cuda.cpp 
           ENERGY-OMP.cpp 
           ENERGY-OMPTarget.cpp 
+          LULESH.cpp 
+          LULESH-Seq.cpp 
+          LULESH-Cuda.cpp 
+          LULESH-OMP.cpp 
+          LULESH-OMP.cpp 
           PRESSURE.cpp 
           PRESSURE-Seq.cpp 
           PRESSURE-Cuda.cpp 

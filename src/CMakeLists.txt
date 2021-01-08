@@ -33,6 +33,9 @@ blt_add_executable(
   apps/PRESSURE.cpp
   apps/PRESSURE-Seq.cpp
   apps/PRESSURE-OMPTarget.cpp
+  apps/LULESH.cpp
+  apps/LULESH-Seq.cpp
+  apps/LULESH-OMPTarget.cpp
   lcals/GEN_LIN_RECUR.cpp
   lcals/GEN_LIN_RECUR-Seq.cpp
   lcals/GEN_LIN_RECUR-OMPTarget.cpp

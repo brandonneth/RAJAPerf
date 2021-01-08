@@ -112,7 +112,7 @@ enum KernelID {
 //
   Apps_ENERGY,
   Apps_PRESSURE,
-
+  Apps_LULESH,
   NumKernels // Keep this one last and NEVER comment out (!!)
 
 };

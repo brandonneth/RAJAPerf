@@ -29,6 +29,7 @@
 //
 #include "apps/ENERGY.hpp"
 #include "apps/PRESSURE.hpp"
+#include "apps/LULESH.hpp"
 
 #include <iostream>
 
@@ -91,6 +92,7 @@ static const std::string KernelNames [] =
 //
   std::string("Apps_ENERGY"),
   std::string("Apps_PRESSURE"),
+  std::string("Apps_LULESH"),
 
   std::string("Unknown Kernel")  // Keep this at the end and DO NOT remove....
 
@@ -243,6 +245,10 @@ KernelBase* getKernelObject(KernelID kid,
     }
     case Apps_PRESSURE : {
        kernel = new apps::PRESSURE(run_params);
+       break;
+    }
+    case Apps_LULESH : {
+       kernel = new apps::LULESH(run_params);
        break;
     }
 
