@@ -35,9 +35,9 @@
   m_Ainit = m_A; \
   m_Binit = m_B; \
   m_Cinit = m_C; \
-  m_A = A.data; \
-  m_B = B.data; \
-  m_C = C.data;
+  m_A = A.get_data(); \
+  m_B = B.get_data(); \
+  m_C = C.get_data();
 
 
 #define POLYBENCH_JACOBI_1D_BODY1 \
