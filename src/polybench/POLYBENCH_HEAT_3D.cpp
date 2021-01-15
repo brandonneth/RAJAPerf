@@ -54,7 +54,7 @@ POLYBENCH_HEAT_3D::POLYBENCH_HEAT_3D(const RunParams& params)
       m_factor = 0.0001;
       break;
     case Extralarge:
-      m_N=400;
+      m_N=600;
       m_tsteps=10;
       run_reps = 1;
       m_factor = 0.00001;

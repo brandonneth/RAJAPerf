@@ -17,7 +17,7 @@ namespace rajaperf
 {
 namespace polybench
 {
-
+constexpr static int tilesize = 60;
  
 void POLYBENCH_HEAT_3D::runOpenMPVariant(VariantID vid)
 {
@@ -63,7 +63,14 @@ void POLYBENCH_HEAT_3D::runOpenMPVariant(VariantID vid)
             RAJA::statement::For<2, RAJA::loop_exec,
               RAJA::statement::Lambda<1>
             >
+          >,
+          RAJA::statement::Collapse<RAJA::omp_parallel_collapse_exec,
+                                    RAJA::ArgList<0, 1>,
+            RAJA::statement::For<2, RAJA::loop_exec,
+              RAJA::statement::Lambda<2>
+            >
           >
+
         >;
 
       startTimer();
@@ -75,9 +82,7 @@ void POLYBENCH_HEAT_3D::runOpenMPVariant(VariantID vid)
                                                    RAJA::RangeSegment{1, N-1},
                                                    RAJA::RangeSegment{1, N-1}),
 
-            poly_heat3d_lam1,
-            poly_heat3d_lam2
-          );
+          lam1, lam2, lam3);
 
         }
 
@@ -117,7 +122,7 @@ void POLYBENCH_HEAT_3D::runOpenMPVariant(VariantID vid)
       auto shiftedSeg = RAJA::make_tuple(RAJA::RangeSegment{2,N}, RAJA::RangeSegment(2,N), RAJA::RangeSegment(2,N));
 
       auto overlapSeg = RAJA::make_tuple(RAJA::RangeSegment(2,N-1),RAJA::RangeSegment(2,N-1),RAJA::RangeSegment(2,N-1));
-      auto tileSize = 12;
+      auto tileSize = tilesize;
       auto numTiles = ((N-3) / tileSize) + 1;
 
       auto tiled_lam = [=](auto iTile, auto jTile, auto kTile) {
@@ -200,7 +205,7 @@ void POLYBENCH_HEAT_3D::runOpenMPVariant(VariantID vid)
       auto knl2 = RAJA::make_kernel<KPol>(seg, lam2);
       auto knl3 = RAJA::make_kernel<KPol>(seg, lam3);
 
-      auto tiledKnl = RAJA::overlapped_tile_no_fuse<12>(knl1,knl2);
+      auto tiledKnl = RAJA::overlapped_tile_no_fuse<tilesize>(knl1,knl2);
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
 

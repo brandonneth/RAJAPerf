@@ -45,7 +45,7 @@ POLYBENCH_JACOBI_2D::POLYBENCH_JACOBI_2D(const RunParams& params)
       run_reps = 10;
       break;
     case Extralarge:
-      m_N=2800;
+      m_N=4000;
       m_tsteps=10;
       run_reps = 1;
       break;

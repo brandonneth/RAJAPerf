@@ -17,7 +17,7 @@ namespace rajaperf
 {
 namespace polybench
 {
-
+constexpr static int tilesize = 16;
 
 void POLYBENCH_JACOBI_2D::runOpenMPVariant(VariantID vid)
 {
@@ -69,6 +69,11 @@ void POLYBENCH_JACOBI_2D::runOpenMPVariant(VariantID vid)
             RAJA::statement::For<1, RAJA::loop_exec,
               RAJA::statement::Lambda<1>
             >
+          >,
+          RAJA::statement::For<0, RAJA::omp_parallel_for_exec,
+            RAJA::statement::For<1, RAJA::loop_exec,
+              RAJA::statement::Lambda<2>
+            >
           >
         >;
 
@@ -80,9 +85,7 @@ void POLYBENCH_JACOBI_2D::runOpenMPVariant(VariantID vid)
           RAJA::kernel<EXEC_POL>( RAJA::make_tuple(RAJA::RangeSegment{1, N-1},
                                                    RAJA::RangeSegment{1, N-1}),
 
-	    poly_jacobi2d_lam1,
-	    poly_jacobi2d_lam2
-          );
+	    lam1,lam2,lam3          );
 
         }
 
@@ -121,7 +124,7 @@ void POLYBENCH_JACOBI_2D::runOpenMPVariant(VariantID vid)
         Cview(i-1,j-1) = 0.2 * (Bview(i-1,j-1) + Bview(i-1,j-2) + Bview(i-1,j) + Bview(i,j-1) + Bview(i-2,j-1));
       };
 
-      int tileSize = 16;
+      int tileSize = tilesize;
       int numTiles = (N-3) / tileSize + 1;
       auto tiledLam = [=](auto iTileNum, auto jTileNum) {
         int iStart = (iTileNum *tileSize) + 1;
@@ -195,7 +198,7 @@ void POLYBENCH_JACOBI_2D::runOpenMPVariant(VariantID vid)
       auto knl2 = RAJA::make_kernel<EXEC_POL>(seg, lam2);
       auto knl3 = RAJA::make_kernel<EXEC_POL>(seg, lam3);
      
-      auto tiledKnl = RAJA::overlapped_tile_no_fuse<16>(knl1, knl2);
+      auto tiledKnl = RAJA::overlapped_tile_no_fuse<tilesize>(knl1, knl2);
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
 

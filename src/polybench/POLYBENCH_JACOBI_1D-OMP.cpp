@@ -54,11 +54,15 @@ void POLYBENCH_JACOBI_1D::runOpenMPVariant(VariantID vid)
         for (Index_type t = 0; t < tsteps; ++t) {
 
           RAJA::forall<RAJA::omp_parallel_for_exec> (RAJA::RangeSegment{1, N-1},
-            poly_jacobi1d_lam1
+            lam1
           );
 
           RAJA::forall<RAJA::omp_parallel_for_exec> (RAJA::RangeSegment{1, N-1},
-            poly_jacobi1d_lam2
+            lam2
+          );
+         
+          RAJA::forall<RAJA::omp_parallel_for_exec> (RAJA::RangeSegment{1, N-1},
+            lam3
           );
 
         }
