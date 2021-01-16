@@ -28,51 +28,47 @@
 #define RAJAPerf_POLYBENCH_JACOBI_2D_HPP
 
 #define POLYBENCH_JACOBI_2D_DATA_SETUP \
-  Real_ptr A = m_Ainit; \
+  Real_ptr A1 = m_A1init; \
+  Real_ptr A2 = m_A2init; \
   Real_ptr B = m_Binit; \
-  Real_ptr C = m_Cinit; \
 \
   const Index_type N = m_N; \
   const Index_type tsteps = m_tsteps;
 
 #define POLYBENCH_JACOBI_2D_DATA_RESET \
-  m_Ainit = m_A; \
+  m_A1init = m_A1; \
   m_Binit = m_B; \
-  m_Cinit = m_C; \
-  m_A = A; \
+  m_A2init = m_A2; \
+  m_A1 = A1; \
   m_B = B; \
-  m_C = C;
+  m_A2 = A2;
 
 
 #define POLYBENCH_JACOBI_2D_BODY1 \
-  B[j + i*N] = 0.2 * (A[j + i*N] + A[j-1 + i*N] + A[j+1 + i*N] + A[j + (i+1)*N] + A[j + (i-1)*N]);
+  B[j + i*N] = 0.2 * (A1[j + i*N] + A1[j-1 + i*N] + A1[j+1 + i*N] + A1[j + (i+1)*N] + A1[j + (i-1)*N]);
 
 #define POLYBENCH_JACOBI_2D_BODY2 \
-  A[j + i*N] = 0.2 * (B[j + i*N] + B[j-1 + i*N] + B[j+1 + i*N] + B[j + (i+1)*N] + B[j + (i-1)*N]);
+  A2[j + i*N] = 0.2 * (B[j + i*N] + B[j-1 + i*N] + B[j+1 + i*N] + B[j + (i+1)*N] + B[j + (i-1)*N]);
 
 
 #define POLYBENCH_JACOBI_2D_BODY1_RAJA \
-  Bview(i,j) = 0.2 * (Aview(i,j) + Aview(i,j-1) + Aview(i,j+1) + Aview(i+1,j) + Aview(i-1,j));
+  Bview(i,j) = 0.2 * (Aview1(i,j) + Aview1(i,j-1) + Aview1(i,j+1) + Aview1(i+1,j) + Aview1(i-1,j));
 
 #define POLYBENCH_JACOBI_2D_BODY2_RAJA \
-  Aview(i,j) = 0.2 * (Bview(i,j) + Bview(i,j-1) + Bview(i,j+1) + Bview(i+1,j) + Bview(i-1,j));
+  Aview2(i,j) = 0.2 * (Bview(i,j) + Bview(i,j-1) + Bview(i,j+1) + Bview(i+1,j) + Bview(i-1,j));
 
-#define POLYBENCH_JACOBI_2D_A2B \
-  Bview(i,j) = 0.2 * (Aview(i,j) + Aview(i,j-1) + Aview(i,j+1) + Aview(i+1,j) + Aview(i-1,j));
-
-#define POLYBENCH_JACOBI_2D_B2C \
-  Cview(i,j) = 0.2 * (Bview(i,j) + Bview(i,j-1) + Bview(i,j+1) + Bview(i+1,j) + Bview(i-1,j));
-
-#define POLYBENCH_JACOBI_2D_C2A \
-  Aview(i,j) = Cview(i,j);
+#define SWAP_J2 \
+auto temp = Aview2.get_data(); \
+Aview2.set_data(Aview1.get_data()); \
+Aview1.set_data(temp);
 
 #define POLYBENCH_JACOBI_2D_VIEWS_RAJA \
 using VIEW_TYPE = RAJA::View<Real_type, \
                              RAJA::Layout<2, Index_type, 1>>; \
 \
-  VIEW_TYPE Aview(A, RAJA::Layout<2>(N, N)); \
+  VIEW_TYPE Aview1(A1, RAJA::Layout<2>(N, N)); \
   VIEW_TYPE Bview(B, RAJA::Layout<2>(N, N)); \
-  VIEW_TYPE Cview(C, RAJA::Layout<2>(N, N));
+  VIEW_TYPE Aview2(A2, RAJA::Layout<2>(N, N));
 
 #include "common/KernelBase.hpp"
 
@@ -106,12 +102,12 @@ private:
   Index_type m_N;
   Index_type m_tsteps;
 
-  Real_ptr m_A;
+  Real_ptr m_A1;
   Real_ptr m_B;
-  Real_ptr m_C;
-  Real_ptr m_Ainit;
+  Real_ptr m_A2;
+  Real_ptr m_A1init;
   Real_ptr m_Binit;
-  Real_ptr m_Cinit;
+  Real_ptr m_A2init;
 };
 
 } // end namespace polybench

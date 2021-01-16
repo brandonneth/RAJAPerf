@@ -68,26 +68,28 @@ POLYBENCH_JACOBI_1D::~POLYBENCH_JACOBI_1D()
 void POLYBENCH_JACOBI_1D::setUp(VariantID vid)
 {
   (void) vid;
-  allocAndInitData(m_Ainit, getRunSize(), vid);
+  allocAndInitData(m_A1init, getRunSize(), vid);
+  allocAndInitData(m_A2init, getRunSize(), vid);
   allocAndInitData(m_Binit, getRunSize(), vid);
-  allocAndInitData(m_Cinit, getRunSize(), vid);
-  allocAndInitDataConst(m_A, getRunSize(), 0.0, vid);
+  allocAndInitDataConst(m_A1, getRunSize(), 0.0, vid);
   allocAndInitDataConst(m_B, getRunSize(), 0.0, vid);
-  allocAndInitDataConst(m_C, getRunSize(), 0.0, vid);
+  allocAndInitDataConst(m_A2, getRunSize(), 0.0, vid);
 }
 
 void POLYBENCH_JACOBI_1D::updateChecksum(VariantID vid)
 {
-  checksum[vid] += calcChecksum(m_A, m_N);
+  checksum[vid] += calcChecksum(m_A1, m_N);
   checksum[vid] += calcChecksum(m_B, m_N);
 }
 
 void POLYBENCH_JACOBI_1D::tearDown(VariantID vid)
 {
   (void) vid;
-  deallocData(m_A);
+  deallocData(m_A1);
+  deallocData(m_A2);
   deallocData(m_B);
-  deallocData(m_Ainit);
+  deallocData(m_A1init);
+  deallocData(m_A2init);
   deallocData(m_Binit);
 }
 

@@ -67,29 +67,29 @@ POLYBENCH_JACOBI_2D::~POLYBENCH_JACOBI_2D()
 void POLYBENCH_JACOBI_2D::setUp(VariantID vid)
 {
   (void) vid;
-  allocAndInitData(m_Ainit, m_N*m_N, vid);
+  allocAndInitData(m_A1init, m_N*m_N, vid);
   allocAndInitData(m_Binit, m_N*m_N, vid);
-  allocAndInitData(m_Cinit, m_N*m_N, vid);
-  allocAndInitDataConst(m_A, m_N*m_N, 0.0, vid);
+  allocAndInitData(m_A2init, m_N*m_N, vid);
+  allocAndInitDataConst(m_A1, m_N*m_N, 0.0, vid);
   allocAndInitDataConst(m_B, m_N*m_N, 0.0, vid);
-  allocAndInitDataConst(m_C, m_N*m_N, 0.0, vid);
+  allocAndInitDataConst(m_A2, m_N*m_N, 0.0, vid);
 }
 
 void POLYBENCH_JACOBI_2D::updateChecksum(VariantID vid)
 {
-  checksum[vid] += calcChecksum(m_A, m_N*m_N);
+  checksum[vid] += calcChecksum(m_A1, m_N*m_N);
   checksum[vid] += calcChecksum(m_B, m_N*m_N);
 }
 
 void POLYBENCH_JACOBI_2D::tearDown(VariantID vid)
 {
   (void) vid;
-  deallocData(m_A);
+  deallocData(m_A1);
   deallocData(m_B);
-  deallocData(m_C);
-  deallocData(m_Ainit);
+  deallocData(m_A2);
+  deallocData(m_A1init);
   deallocData(m_Binit);
-  deallocData(m_Cinit);
+  deallocData(m_A2init);
 }
 
 } // end namespace polybench

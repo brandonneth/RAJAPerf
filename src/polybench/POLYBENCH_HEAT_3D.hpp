@@ -67,7 +67,7 @@
                    A[k + N*(j + N*i)];
 
 #define POLYBENCH_HEAT_3D_BODY2 \
-  A[k + N*(j + N*i)] = \
+  C[k + N*(j + N*i)] = \
                    0.125*( B[k + N*(j + N*(i+1))] - 2.0*B[k + N*(j + N*i)] + \
                            B[k + N*(j + N*(i-1))] ) + \
                    0.125*( B[k + N*(j+1 + N*i)]   - 2.0*B[k + N*(j + N*i)] + \
@@ -103,8 +103,11 @@
              0.125*( Bview(i,j+1,k) - 2.0*Bview(i,j,k) + Bview(i,j-1,k) ) + \
              0.125*( Bview(i,j,k+1) - 2.0*Bview(i,j,k) + Bview(i,j,k-1) ) + \
              Bview(i,j,k);
-#define POLYBENCH_HEAT_3D_C2A \
-  Aview(i,j,k) = Cview(i,j,k)
+
+#define SWAP_HEAT \
+auto temp = Cview.get_data(); \
+Cview.set_data(Aview.get_data()); \
+Aview.set_data(temp);
 
 #define POLYBENCH_HEAT_3D_VIEWS_RAJA \
 using VIEW_TYPE = RAJA::View<Real_type, \

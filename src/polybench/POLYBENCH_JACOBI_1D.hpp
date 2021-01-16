@@ -11,11 +11,12 @@
 ///
 /// for (t = 0; t < TSTEPS; t++)
 /// {
+///   swap(A1,A2);
 ///   for (i = 1; i < N - 1; i++) {
-///     B[i] = 0.33333 * (A[i-1] + A[i] + A[i + 1]);
+///     B[i] = 0.33333 * (A1[i-1] + A1[i] + A1[i + 1]);
 ///   }
 ///   for (i = 1; i < N - 1; i++) {
-///     A[i] = 0.33333 * (B[i-1] + B[i] + B[i + 1]);
+///     A2[i] = 0.33333 * (B[i-1] + B[i] + B[i + 1]);
 ///   }
 /// }
 
@@ -25,35 +26,31 @@
 
 #define POLYBENCH_JACOBI_1D_DATA_SETUP \
   using ViewType = RAJA::View<Real_type, RAJA::Layout<1, Index_type, 1>>; \
-  ViewType A(m_Ainit, m_N);\
+  ViewType A1(m_A1init, m_N);\
   ViewType B(m_Binit, m_N);\
-  ViewType C(m_Cinit, m_N);\
+  ViewType A2(m_A2init, m_N);\
   const Index_type N = getRunSize(); \
   const Index_type tsteps = m_tsteps;
 
 #define POLYBENCH_JACOBI_1D_DATA_RESET \
-  m_Ainit = m_A; \
+  m_A1init = m_A1; \
+  m_A2init = m_A2; \
   m_Binit = m_B; \
-  m_Cinit = m_C; \
-  m_A = A.get_data(); \
+  m_A1 = A1.get_data(); \
   m_B = B.get_data(); \
-  m_C = C.get_data();
+  m_A2 = A2.get_data();
 
 
 #define POLYBENCH_JACOBI_1D_BODY1 \
-  B(i) = 0.33333 * (A(i-1) + A(i) + A(i+1));  
+  B(i) = 0.33333 * (A1(i-1) + A1(i) + A1(i+1));  
 
 #define POLYBENCH_JACOBI_1D_BODY2 \
-  A(i) = 0.33333 * (B(i-1) + B(i) + B(i+1));
+  A2(i) = 0.33333 * (B(i-1) + B(i) + B(i+1));
 
-#define POLYBENCH_JACOBI_1D_A2B \
-  B(i) = 0.33333 * (A(i-1) + A(i) + A(i+1));
-
-#define POLYBENCH_JACOBI_1D_B2C \
-  C(i) = 0.33333 * (B(i-1) + B(i) + B(i+1));
-
-#define POLYBENCH_JACOBI_1D_C2A \
-  A(i) = C(i);
+#define SWAP \
+  auto temp = A2.get_data(); \
+  A2.set_data(A1.get_data()); \
+  A1.set_data(temp); \
 
 #include "common/KernelBase.hpp"
 
@@ -87,12 +84,12 @@ private:
   Index_type m_N;
   Index_type m_tsteps;
 
-  Real_ptr m_A;
+  Real_ptr m_A1;
   Real_ptr m_B;
-  Real_ptr m_C;
-  Real_ptr m_Ainit;
+  Real_ptr m_A2;
+  Real_ptr m_A1init;
+  Real_ptr m_A2init;
   Real_ptr m_Binit;
-  Real_ptr m_Cinit;
 };
 
 } // end namespace polybench
