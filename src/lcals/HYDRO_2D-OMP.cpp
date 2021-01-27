@@ -21,7 +21,7 @@ namespace lcals
 void HYDRO_2D::runOpenMPVariant(VariantID vid)
 {
 #if defined(RAJA_ENABLE_OPENMP) && defined(RUN_OPENMP)
-
+  static constexpr int tilesize = 80;
   const Index_type run_reps = getRunReps();
   const Index_type kbeg = 1;
   const Index_type kend = m_kn - 1;
@@ -137,7 +137,7 @@ void HYDRO_2D::runOpenMPVariant(VariantID vid)
 
       using namespace RAJA;
 
-      int tileSize = 32;
+      int tileSize = tilesize;
       int kTiles = ((kend-kbeg+1) / tileSize) + 1;
       int jTiles = ((jend-jbeg+1) / tileSize) + 1;
   
@@ -205,7 +205,7 @@ void HYDRO_2D::runOpenMPVariant(VariantID vid)
       using EXECPOL =
         RAJA::KernelPolicy<
           RAJA::statement::For<0, RAJA::omp_for_nowait_exec,  // k
-            RAJA::statement::For<1, RAJA::loop_exec,  // j
+            RAJA::statement::For<1, RAJA::omp_for_nowait_exec,  // j
               RAJA::statement::Lambda<0>
             >
           >
@@ -216,7 +216,7 @@ void HYDRO_2D::runOpenMPVariant(VariantID vid)
       auto knl2 = RAJA::make_kernel<EXECPOL>(seg, hydro2d_lam2);
       auto knl3 = RAJA::make_kernel<EXECPOL>(seg, hydro2d_lam3);
 
-      auto tiledKnl = RAJA::overlapped_tile_no_fuse<32>(knl1,knl2,knl3);
+      auto tiledKnl = RAJA::overlapped_tile_no_fuse<20>(knl1,knl2,knl3);
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
 

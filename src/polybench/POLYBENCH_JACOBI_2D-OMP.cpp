@@ -188,7 +188,7 @@ void POLYBENCH_JACOBI_2D::runOpenMPVariant(VariantID vid)
       auto knl1 = RAJA::make_kernel<EXEC_POL>(seg, lam1);
       auto knl2 = RAJA::make_kernel<EXEC_POL>(seg, lam2);
      
-      auto tiledKnl = RAJA::overlapped_tile_no_fuse<256>(knl1, knl2);
+      auto tiledKnl = RAJA::overlapped_tile_no_fuse<128>(knl1, knl2);
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
 
